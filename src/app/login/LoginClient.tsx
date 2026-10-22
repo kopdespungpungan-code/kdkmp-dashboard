@@ -6,7 +6,42 @@ import SubmitButton from "@/components/SubmitButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+const PESAN: Record<string, { judul: string; saran?: string }> = {
+  salah: {
+    judul: "Email atau kata sandi tidak cocok.",
+    saran:
+      "Kalau akun ini belum pernah dibuat, tambahkan dulu di Supabase → Authentication → Users → Add user (centang Auto Confirm User).",
+  },
+  belum_konfirmasi: {
+    judul: "Email akun ini belum dikonfirmasi.",
+    saran: "Buka Supabase → Authentication → Users, pilih user tersebut, lalu Confirm email.",
+  },
+  tidak_ada: {
+    judul: "Akun dengan email ini belum terdaftar.",
+    saran: "Buat user-nya di Supabase → Authentication → Users → Add user.",
+  },
+  env: {
+    judul: "Server belum terhubung ke Supabase.",
+    saran:
+      "Isi NEXT_PUBLIC_SUPABASE_URL dan NEXT_PUBLIC_SUPABASE_ANON_KEY di Vercel (Settings → Environment Variables), lalu Redeploy.",
+  },
+  jaringan: {
+    judul: "Server tidak bisa menghubungi Supabase.",
+    saran: "Periksa NEXT_PUBLIC_SUPABASE_URL — pastikan tidak ada salah ketik atau spasi.",
+  },
+  batas: {
+    judul: "Terlalu banyak percobaan masuk.",
+    saran: "Tunggu sekitar satu menit, lalu coba lagi.",
+  },
+  lain: {
+    judul: "Gagal masuk.",
+    saran: "Buka /api/health di browser untuk melihat kondisi koneksi server.",
+  },
+};
+
 export default function LoginClient({ error }: { error?: string }) {
+  const pesan = error ? (PESAN[error] ?? PESAN.lain) : null;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -34,10 +69,20 @@ export default function LoginClient({ error }: { error?: string }) {
           transition={{ duration: 0.4, delay: 0.2 }}
         >
           <h2 className="mb-5 text-2xl font-bold">Masuk</h2>
-          {error && (
-            <p role="alert" className="mb-4 rounded border border-primary/40 bg-accent px-3 py-2 text-sm text-accent-foreground">
-              Email atau kata sandi salah. Periksa lalu coba lagi.
-            </p>
+          {pesan && (
+            <div
+              role="alert"
+              className="mb-4 rounded border border-primary/40 bg-accent px-3 py-2 text-sm text-accent-foreground"
+            >
+              <p className="font-semibold">{pesan.judul}</p>
+              {pesan.saran && <p className="mt-1 text-xs leading-relaxed">{pesan.saran}</p>}
+              <p className="mt-1 text-xs leading-relaxed opacity-80">
+                Cek koneksi server:{" "}
+                <a href="/api/health" className="underline" target="_blank" rel="noreferrer">
+                  /api/health
+                </a>
+              </p>
+            </div>
           )}
           <div className="space-y-2 mb-4">
             <Label htmlFor="email">Email</Label>

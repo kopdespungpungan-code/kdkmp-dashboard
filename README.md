@@ -158,6 +158,27 @@ Kalau project Supabase-mu di region lain, sesuaikan nilainya.
    **SO Gondola** (semua tingkat 1–6 tampil).
 3. Coba **Simpan SO** sekali, lalu cek di Supabase: `select * from so_gondola order by id desc limit 5;`
 
+### Tidak bisa login setelah deploy
+
+Buka **`https://<domain-vercel>/api/health`** lebih dulu. Jawabannya langsung menunjukkan masalahnya:
+
+| Hasil `/api/health` | Artinya | Tindakan |
+|---|---|---|
+| `"status": "env-belum-diisi"` | Vercel belum punya env Supabase | Settings → Environment Variables → isi 2 variabel → **Redeploy** |
+| `"status": "url-tidak-valid"` | URL Supabase salah ketik | Perbaiki `NEXT_PUBLIC_SUPABASE_URL` |
+| `auth.statusCode: 401` / `database.statusCode: 401` | **ANON KEY salah** | Ambil ulang dari Supabase → Settings → API |
+| `"status": "ok"` tapi login gagal | **User belum ada / belum dikonfirmasi** | Supabase → Authentication → Users → **Add user**, centang *Auto Confirm User* |
+
+Catatan penting:
+
+- Aplikasi ini **tidak punya halaman daftar**. Akun dibuat manual oleh admin di Supabase Auth.
+- Akun dashboard Supabase (yang dipakai untuk login ke supabase.com) **bukan** akun aplikasi ini.
+- Kalau pesan di halaman login menyebut *"Email akun ini belum dikonfirmasi"*, buka user tersebut di
+  Authentication → Users lalu klik **Confirm email**.
+- Setelah mengubah Environment Variables di Vercel, wajib **Redeploy** — env lama tidak ikut berubah
+  pada deployment yang sudah ada.
+- Pastikan kamu membuka **Production URL** (bukan Preview), karena Preview bisa memakai env berbeda.
+
 ### Catatan penting di Vercel
 - **Tanpa login, semua halaman diarahkan ke `/login`** oleh middleware. Kalau muncul 404/redirect
   terus, berarti user belum dibuat atau env Supabase salah.
