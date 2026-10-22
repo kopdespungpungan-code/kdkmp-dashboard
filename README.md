@@ -166,8 +166,13 @@ Buka **`https://<domain-vercel>/api/health`** lebih dulu. Jawabannya langsung me
 |---|---|---|
 | `"status": "env-belum-diisi"` | Vercel belum punya env Supabase | Settings → Environment Variables → isi 2 variabel → **Redeploy** |
 | `"status": "url-tidak-valid"` | URL Supabase salah ketik | Perbaiki `NEXT_PUBLIC_SUPABASE_URL` |
-| `auth.statusCode: 401` / `database.statusCode: 401` | **ANON KEY salah** | Ambil ulang dari Supabase → Settings → API |
+| `auth.statusCode: 401` / `skema.*.statusCode: 401` | **ANON KEY salah** | Ambil ulang dari Supabase → Settings → API |
+| `"status": "skema-belum-dibuat"` | URL & key valid, tapi **project-nya kosong** (belum ada tabel) | Jalankan SQL di folder `supabase/`, **atau** ganti env ke project yang sudah berisi data |
 | `"status": "ok"` tapi login gagal | **User belum ada / belum dikonfirmasi** | Supabase → Authentication → Users → **Add user**, centang *Auto Confirm User* |
+
+> **URL dan ANON KEY wajib berasal dari project Supabase yang sama.** Kalau URL dari project A
+> dan key dari project B, halaman akan error aneh (tabel tidak ditemukan / key ditolak).
+> Cek nama host di `/api/health` — harus sama dengan project yang kamu buka di dashboard.
 
 Catatan penting:
 
