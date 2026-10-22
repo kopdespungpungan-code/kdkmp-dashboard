@@ -3,12 +3,14 @@
 @theme {
   --font-display: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Public Sans Variable", ui-sans-serif, system-ui, sans-serif;
+
+  /* === Light mode (default) === */
   --color-ink: #1b2430;
   --color-kertas: #f5f6f3;
   --color-putih: #ffffff;
   --color-garis: #d9dcd6;
   --color-redup: #667085;
-  --color-merah: #b3202a;
+  --color-merah: #be1e2d;
   --color-merah-tua: #8f1820;
   --color-merah-muda: #fbeaeb;
   --color-hijau: #2f7d4f;
@@ -16,38 +18,71 @@
   --color-kuning: #9a6a0b;
   --color-kuning-muda: #fbf1d9;
 
-  /* shadcn/ui variables (Tailwind v4: prefix --color- agar generate utility class) */
+  /* shadcn/ui variables (light) */
   --color-background: #ffffff;
   --color-foreground: #1b2430;
   --color-card: #ffffff;
   --color-card-foreground: #1b2430;
   --color-popover: #ffffff;
   --color-popover-foreground: #1b2430;
-  --color-primary: #b3202a;
+  --color-primary: #be1e2d;
   --color-primary-foreground: #ffffff;
-  --color-secondary: #eef0eb;
+  --color-secondary: #f5f6f3;
   --color-secondary-foreground: #1b2430;
   --color-muted: #eef0eb;
   --color-muted-foreground: #667085;
-  --color-accent: #eef0eb;
-  --color-accent-foreground: #1b2430;
+  --color-accent: #fbeaeb;
+  --color-accent-foreground: #8f1820;
   --color-destructive: #ef4444;
   --color-destructive-foreground: #ffffff;
   --color-border: #d9dcd6;
   --color-input: #d9dcd6;
-  --color-ring: #b3202a;
+  --color-ring: #be1e2d;
+
   --radius: 0.75rem;
+}
+
+/* === Dark mode === */
+.dark {
+  --color-ink: #f1f2f4;
+  --color-kertas: #0b0c10;
+  --color-putih: #0b0c10;
+  --color-garis: #2a2d36;
+  --color-redup: #9ca3af;
+
+  --color-background: #0b0c10;
+  --color-foreground: #f1f2f4;
+  --color-card: #12141a;
+  --color-card-foreground: #f1f2f4;
+  --color-popover: #12141a;
+  --color-popover-foreground: #f1f2f4;
+  --color-primary: #ff3b3b;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #1a1c22;
+  --color-secondary-foreground: #f1f2f4;
+  --color-muted: #1e2129;
+  --color-muted-foreground: #9ca3af;
+  --color-accent: #1e2129;
+  --color-accent-foreground: #f1f2f4;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  --color-border: #2a2d36;
+  --color-input: #2a2d36;
+  --color-ring: #ff3b3b;
 }
 
 html {
   background: var(--color-kertas);
   color: var(--color-ink);
 }
+
 body {
   font-family: var(--font-sans);
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
+
 h1, h2, h3, .font-display {
   font-family: var(--font-display);
   letter-spacing: -0.01em;
@@ -66,38 +101,156 @@ h1, h2, h3, .font-display {
   padding: 0.5rem 0.65rem;
   font-size: 0.9rem;
   min-height: 2.4rem;
+  color: var(--color-ink);
 }
-.input:focus { border-color: var(--color-merah); outline: none; box-shadow: 0 0 0 2px var(--color-merah-muda); }
-.label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.25rem; color: var(--color-ink); }
-.hint { font-size: 0.75rem; color: var(--color-redup); margin-top: 0.2rem; }
+.input:focus {
+  border-color: var(--color-merah);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-merah-muda);
+}
+
+.label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: var(--color-ink);
+}
+
+.hint {
+  font-size: 0.75rem;
+  color: var(--color-redup);
+  margin-top: 0.2rem;
+}
 
 .btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
-  border-radius: 4px; padding: 0.5rem 0.95rem; min-height: 2.4rem;
-  font-size: 0.9rem; font-weight: 600; cursor: pointer;
-  border: 1px solid var(--color-ink); background: var(--color-putih); color: var(--color-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 4px;
+  padding: 0.5rem 0.95rem;
+  min-height: 2.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--color-ink);
+  background: var(--color-putih);
+  color: var(--color-ink);
+  transition: all 0.2s ease;
 }
-.btn:hover { background: var(--color-kertas); }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn-primary { background: var(--color-merah); border-color: var(--color-merah); color: #fff; }
-.btn-primary:hover { background: var(--color-merah-tua); }
+.btn:hover {
+  background: var(--color-kertas);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background: var(--color-merah);
+  border-color: var(--color-merah);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--color-merah-tua);
+}
 
 @layer base {
-  h1, h2, h3, h4, h5, h6, .font-display {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .font-display {
     font-family: var(--font-display);
     letter-spacing: -0.01em;
   }
-  h1 { font-size: 1.875rem; line-height: 2.25rem; font-weight: 700; }
-  h2 { font-size: 1.5rem; line-height: 2rem; font-weight: 700; }
-  h3 { font-size: 1.25rem; line-height: 1.75rem; font-weight: 700; }
-  p { line-height: 1.5; }
+  h1 {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+    font-weight: 700;
+  }
+  h2 {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    font-weight: 700;
+  }
+  h3 {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    font-weight: 700;
+  }
+  p {
+    line-height: 1.5;
+  }
 }
 
-.num { text-align: right !important; }
+.num {
+  text-align: right !important;
+}
+
+/* Elemen khusus cetak: disembunyikan di layar, ditampilkan saat print */
+.print-only {
+  display: none;
+}
 
 @media print {
-  body { background: white; }
-  .print\:hidden { display: none !important; }
-  aside, header, nav { display: none !important; }
-  main { padding: 0 !important; margin: 0 !important; }
+  body {
+    background: white;
+  }
+  .print\:hidden {
+    display: none !important;
+  }
+  aside,
+  header,
+  nav {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Sembunyikan seluruh UI aplikasi, tampilkan hanya area cetak */
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  .print-layout {
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  /* Hide interactive elements during print */
+  button,
+  input[type="number"],
+  .btn,
+  .page-header-actions {
+    display: none !important;
+  }
+
+  /* Ensure table borders print */
+  table {
+    border-collapse: collapse !important;
+  }
+
+  th, td {
+    border-color: #999 !important;
+  }
+
+  .kop-surat img {
+    max-width: 40mm;
+    max-height: 40mm;
+  }
 }

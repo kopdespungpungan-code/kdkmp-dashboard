@@ -1,23 +1,14 @@
 import Link from "next/link";
-import type { Tone } from "@/lib/stok";
+import { Badge } from "@/components/ui/badge";
 
-const tones: Record<Tone, string> = {
-  merah: "bg-merah-muda text-merah-tua",
-  kuning: "bg-kuning-muda text-kuning",
-  hijau: "bg-hijau-muda text-hijau",
-  abu: "bg-garis/50 text-redup",
-};
-
-export function Badge({ tone, children }: { tone: Tone; children: React.ReactNode }) {
-  return <span className={`inline-block rounded px-1.5 py-0.5 text-xs font-semibold whitespace-nowrap ${tones[tone]}`}>{children}</span>;
-}
+export { Badge };
 
 export function PageHeader({ title, sub, action }: { title: string; sub?: string; action?: React.ReactNode }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-3 border-b-2 border-ink pb-3">
+    <div className="mb-6 flex flex-wrap items-end justify-between gap-3 border-b-2 border-border pb-3">
       <div>
         <h1 className="text-2xl font-bold sm:text-3xl">{title}</h1>
-        {sub && <p className="mt-0.5 text-sm text-redup">{sub}</p>}
+        {sub && <p className="mt-0.5 text-sm text-muted-foreground">{sub}</p>}
       </div>
       {action}
     </div>
@@ -36,12 +27,24 @@ export function Section({ title, action, children }: { title: string; action?: R
   );
 }
 
-export function Alert({ children }: { children: React.ReactNode }) {
-  return <div role="alert" className="mb-4 rounded border border-merah/40 bg-merah-muda px-3 py-2 text-sm text-merah-tua">{children}</div>;
+export function Alert({
+  children,
+  tone = "info",
+}: {
+  children: React.ReactNode;
+  tone?: "info" | "merah" | "kuning" | "hijau";
+}) {
+  const gaya = {
+    info: "border-primary/40 bg-accent text-accent-foreground",
+    merah: "border-merah/40 bg-merah-muda text-merah-tua",
+    kuning: "border-kuning/40 bg-kuning-muda text-kuning",
+    hijau: "border-hijau/40 bg-hijau-muda text-hijau",
+  }[tone];
+  return <div role="alert" className={`mb-4 rounded border px-3 py-2 text-sm ${gaya}`}>{children}</div>;
 }
 
 export function Empty({ children }: { children: React.ReactNode }) {
-  return <p className="rounded border border-dashed border-garis px-4 py-8 text-center text-sm text-redup">{children}</p>;
+  return <p className="rounded border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground">{children}</p>;
 }
 
 export function LinkButton({ href, children, primary }: { href: string; children: React.ReactNode; primary?: boolean }) {

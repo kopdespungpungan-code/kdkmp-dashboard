@@ -2,10 +2,13 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { angka, rupiah, tglTanggal } from "@/lib/format";
 import { statusStok } from "@/lib/stok";
+import { ringkasLokasi, type PetaLokasi } from "@/lib/lokasi";
 import { Alert, Badge, Empty, PageHeader } from "@/components/ui";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faClipboardList, faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import type { Product } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -36,6 +39,34 @@ export default async function ProdukPage({
   const { data, error, count } = await query.order("item").range((page - 1) * PER, page * PER - 1);
 
   const rows = (data ?? []) as (Product & { stok_total?: number })[];
+
+  // Lokasi fisik tiap produk (gondola + tingkat), untuk "product tracking".
+  const petaLokasi = new Map<number, PetaLokasi[]>();
+  if (rows.length > 0) {
+    const { data: lokasi } = await sb
+      .from("product_gondola")
+      .select("produk_id, gondola_no, lokasi, tingkat")
+      .in("produk_id", rows.map((r) => r.id));
+    for (const l of lokasi ?? []) {
+      const id = Number(l.produk_id);
+      const daftar = petaLokasi.get(id) ?? [];
+      daftar.push({
+        gondola_no: l.gondola_no === null ? null : Number(l.gondola_no),
+        lokasi: l.lokasi ?? "",
+        tingkat: l.tingkat === null ? null : Number(l.tingkat),
+      });
+      petaLokasi.set(id, daftar);
+    }
+    // Urutkan supaya tampilannya stabil.
+    for (const daftar of petaLokasi.values()) {
+      daftar.sort((a, b) =>
+        (a.gondola_no ?? 9999) !== (b.gondola_no ?? 9999)
+          ? (a.gondola_no ?? 9999) - (b.gondola_no ?? 9999)
+          : (a.tingkat ?? 99) - (b.tingkat ?? 99),
+      );
+    }
+  }
+
   const total = count ?? 0;
   const pages = Math.max(1, Math.ceil(total / PER));
   const href = (o: { f?: string; p?: number }) => {
@@ -50,7 +81,18 @@ export default async function ProdukPage({
 
   return (
     <>
-      <PageHeader title="Produk" sub={`${angka(total)} produk`} />
+      <PageHeader
+        title="Produk"
+        sub={`${angka(total)} produk`}
+        action={
+          <Button asChild>
+            <Link href="/produk/so">
+              <FontAwesomeIcon icon={faClipboardList} className="mr-2" />
+              Input SO
+            </Link>
+          </Button>
+        }
+      />
       {error && <Alert>{error.message}</Alert>}
 
       <form className="mb-3 flex flex-col sm:flex-row gap-2">
@@ -67,7 +109,7 @@ export default async function ProdukPage({
             href={href({ f: x.key })}
             aria-current={f === x.key ? "true" : undefined}
             className={`rounded-md border px-3 py-1.5 text-sm font-semibold transition-colors ${
-              f === x.key ? "border-ink bg-ink text-white" : "border-garis bg-white hover:border-ink"
+              f === x.key ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background hover:border-primary"
             }`}
           >
             {x.label}
@@ -122,6 +164,15 @@ export default async function ProdukPage({
                       Expired: {tglTanggal(r.expired_terdekat)}
                     </div>
                   )}
+                  <div className="mt-2 flex items-start gap-1.5 text-xs">
+                    <FontAwesomeIcon icon={faLocationDot} className="mt-0.5 text-primary" />
+                    <span>
+                      <span className="text-redup">Lokasi: </span>
+                      <span className="font-semibold">
+                        {ringkasLokasi(petaLokasi.get(r.id) ?? [])}
+                      </span>
+                    </span>
+                  </div>
                 </CardContent>
               </Card>
             );

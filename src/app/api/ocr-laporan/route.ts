@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
+// OCR gambar bisa lama; naikkan batas waktu fungsi di Vercel.
+export const maxDuration = 60;
 
 export async function POST(req: Request) {
   try {

@@ -87,7 +87,7 @@ export default function UploadLaporan() {
       setProgress(100);
 
       sessionStorage.setItem("ocr_laporan", JSON.stringify(result));
-      router.push("/laporan-karyawan/preview");
+      router.push("/laporan-karyawan/upload");
     } catch (e: any) {
       setErr(e.message);
     } finally {

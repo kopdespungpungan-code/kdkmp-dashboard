@@ -7,6 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { updateProduk } from "./actions";
 import type { Product } from "@/lib/types";
+import { labelLokasi, type PetaLokasi } from "@/lib/lokasi";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 
 export const dynamic = "force-dynamic";
 
@@ -28,10 +31,33 @@ export default async function EditProduk({
   const p = data as Product;
   const action = updateProduk.bind(null, pid);
 
+  // Lokasi fisik produk: gondola + tingkat, atau "Gudang" bila belum ditempatkan.
+  const { data: lokasiData } = await sb
+    .from("product_gondola")
+    .select("gondola_no, lokasi, tingkat")
+    .eq("produk_id", pid);
+  const daftarLokasi: PetaLokasi[] = (lokasiData ?? []).map((l) => ({
+    gondola_no: l.gondola_no === null ? null : Number(l.gondola_no),
+    lokasi: l.lokasi ?? "",
+    tingkat: l.tingkat === null ? null : Number(l.tingkat),
+  }));
+  const teksLokasi =
+    daftarLokasi.length === 0
+      ? "Gudang (belum ditempatkan di gondola)"
+      : daftarLokasi.map(labelLokasi).join(" · ");
+
   return (
     <>
       <PageHeader title={p.item} sub={`Stok toko ${angka(p.stok_toko)}, gudang ${angka(p.stok_gudang)}. Ubah stok lewat menu Stok.`} action={<LinkButton href="/produk">Kembali</LinkButton>} />
       {error && <Alert>{error}</Alert>}
+
+      <div className="mb-4 flex items-start gap-2 rounded-md border border-border bg-muted/50 p-3 text-sm">
+        <FontAwesomeIcon icon={faLocationDot} className="mt-0.5 text-primary" />
+        <div>
+          <div className="text-xs text-redup">Lokasi</div>
+          <div className="font-semibold">{teksLokasi}</div>
+        </div>
+      </div>
       <form action={action} className="grid max-w-2xl gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2 space-y-2">
           <Label htmlFor="item">Nama barang</Label>

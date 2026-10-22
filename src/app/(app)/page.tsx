@@ -1,20 +1,10 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { addDays, angka, rupiah, tglPanjang, tglPendek, tglTanggal, tglWaktu, todayWIB } from "@/lib/format";
-import { statusStok } from "@/lib/stok";
-import { Alert, Badge, Empty, PageHeader, Section } from "@/components/ui";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import OmzetChart from "@/components/OmzetChart";
+import { addDays, angka, rupiah, tglPanjang, tglPendek, todayWIB } from "@/lib/format";
+import RingkasanClient from "./RingkasanClient";
 
 export const dynamic = "force-dynamic";
+
+type Ringkas = { jenis_produk: number; total_stok: number; menipis: number; habis: number; hampir_expired: number };
 
 type Harian = { tanggal: string; nota: number; pcs: number; omzet: number };
 type Laris = { id: number; item: string; pcs: number; omzet: number };
@@ -22,7 +12,6 @@ type Perhatian = {
   id: number; sku: string | null; item: string; gramasi: string | null;
   stok_toko: number; stok_gudang: number; stok_total: number; stok_min: number | null; expired_terdekat: string | null;
 };
-type Ringkas = { jenis_produk: number; total_stok: number; menipis: number; habis: number; hampir_expired: number };
 type Invoice = { id: number; invoice_no: string; tanggal: string; kasir: string | null; pcs: number; total: number };
 
 export default async function Ringkasan() {
@@ -42,10 +31,14 @@ export default async function Ringkasan() {
   if (err) {
     return (
       <>
-        <PageHeader title="Ringkasan" />
-        <Alert>
-          Data belum bisa dimuat: {err.message}. Pastikan file <code>supabase/dashboard.sql</code> sudah dijalankan di SQL Editor dan Anda sudah masuk.
-        </Alert>
+        <div className="space-y-6">
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-3 border-b-2 border-ink pb-3">
+            <h1 className="text-2xl font-bold sm:text-3xl font-display">Ringkasan</h1>
+          </div>
+          <div role="alert" className="mb-4 rounded border border-merah/40 bg-merah-muda px-3 py-2 text-sm text-merah-tua">
+            Data belum bisa dimuat: {err.message}. Pastikan file <code>supabase/dashboard.sql</code> sudah dijalankan di SQL Editor dan Anda sudah masuk.
+          </div>
+        </div>
       </>
     );
   }
@@ -61,7 +54,7 @@ export default async function Ringkasan() {
   const omzet14 = chart.reduce((a, b) => a + b.omzet, 0);
 
   const urut = ((perhatian.data ?? []) as Perhatian[])
-    .map((p) => ({ ...p, status: statusStok(p.stok_total, p.stok_min, p.expired_terdekat) }))
+    .map((p) => ({ ...p }))
     .sort((a, b) => {
       const pa = a.stok_total <= 0 ? 0 : 1;
       const pb = b.stok_total <= 0 ? 0 : 1;
@@ -77,142 +70,16 @@ export default async function Ringkasan() {
   ];
 
   return (
-    <div className="space-y-6">
-      <PageHeader title="Ringkasan" sub={tglPanjang(today)} />
-
-      {/* KPI Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {kpi.map((k) => (
-          <Card key={k.label}>
-            <CardHeader>
-              <CardTitle className="text-sm text-redup">{k.label}</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className={`font-display font-bold ${k.big ? "text-2xl text-merah" : "text-xl"}`}>{k.value}</div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
-        <Section title="Omzet 14 hari terakhir">
-          <Card>
-            <CardContent className="p-0">
-              <div className="h-64 w-full p-4">
-                <OmzetChart data={chart} />
-              </div>
-            </CardContent>
-          </Card>
-        </Section>
-
-        <Section title="Terlaris 30 hari">
-          <Card>
-            <CardContent className="p-0">
-              {(laris.data ?? []).length === 0 ? (
-                <Empty>Belum ada penjualan.</Empty>
-              ) : (
-                <div className="divide-y divide-garis">
-                  {(laris.data as Laris[]).slice(0, 8).map((p) => (
-                    <div key={p.id} className="flex items-baseline justify-between gap-3 px-4 py-3">
-                      <span className="min-w-0 truncate text-sm">{p.item}</span>
-                      <span className="shrink-0 font-semibold text-sm">{angka(Number(p.pcs))} pcs</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </Section>
-      </div>
-
-      <Section
-        title="Perlu perhatian"
-        action={
-          <Link href="/produk?f=perhatian" className="text-sm font-semibold text-merah underline">
-            Lihat semua ({urut.length})
-          </Link>
-        }
-      >
-        <div className="mb-4 flex flex-wrap gap-2 text-sm">
-          <Badge tone="merah">{angka(Number(r.habis))} habis atau minus</Badge>
-          <Badge tone="kuning">{angka(Number(r.menipis))} menipis</Badge>
-          <Badge tone="kuning">{angka(Number(r.hampir_expired))} hampir expired</Badge>
-          <span className="self-center text-redup">
-            dari {angka(Number(r.jenis_produk))} produk, total {angka(Number(r.total_stok))} pcs
-          </span>
-        </div>
-        {urut.length === 0 ? (
-          <Empty>Semua stok aman.</Empty>
-        ) : (
-          <div className="space-y-3">
-            {urut.slice(0, 10).map((p) => (
-              <Card key={p.id}>
-                <CardHeader className="p-4">
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-                    <div>
-                      <Link href={`/produk/${p.id}`} className="font-semibold hover:underline text-sm">
-                        {p.item}
-                      </Link>
-                      {p.sku && <span className="text-xs text-redup">{p.sku}</span>}
-                    </div>
-                    <div className="flex gap-1">
-                      {p.status.map((s) => (
-                        <Badge key={s.label} tone={s.tone}>
-                          {s.label}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="px-4 pb-4">
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <div className="text-xs text-redup">Toko</div>
-                      <div className="font-semibold">{angka(p.stok_toko)}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-redup">Gudang</div>
-                      <div className="font-semibold">{angka(p.stok_gudang)}</div>
-                    </div>
-                  </div>
-                  {p.expired_terdekat && (
-                    <div className="mt-3 text-xs text-redup">
-                      Expired: {tglTanggal(p.expired_terdekat)}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </Section>
-
-      <Section title="Nota terakhir" action={<Link href="/penjualan" className="text-sm font-semibold text-merah underline">Semua nota</Link>}>
-        {(terakhir.data ?? []).length === 0 ? (
-          <Empty>Belum ada nota. Buat nota pertama dari menu Penjualan.</Empty>
-        ) : (
-          <div className="space-y-3">
-            {(terakhir.data as Invoice[]).map((n) => (
-              <Card key={n.id}>
-                <CardHeader className="p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <Link href={`/penjualan/${n.id}`} className="font-semibold hover:underline text-sm">
-                        {n.invoice_no}
-                      </Link>
-                      <div className="text-xs text-redup">{tglWaktu(n.tanggal)}</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-semibold text-sm">{rupiah(Number(n.total))}</div>
-                      <div className="text-xs text-redup">{angka(Number(n.pcs))} pcs</div>
-                    </div>
-                  </div>
-                </CardHeader>
-              </Card>
-            ))}
-          </div>
-        )}
-      </Section>
-    </div>
+    <RingkasanClient
+      today={today}
+      r={r}
+      chart={chart}
+      hari={hari}
+      omzet14={omzet14}
+      urut={urut}
+      kpi={kpi}
+      laris={(laris.data ?? []) as Laris[]}
+      terakhir={(terakhir.data ?? []) as Invoice[]}
+    />
   );
 }

@@ -4,10 +4,10 @@ import { cn } from "@/components/ui/utils";
 type Tone = "merah" | "kuning" | "hijau" | "abu";
 
 const tones: Record<Tone, string> = {
-  merah: "bg-merah-muda text-merah-tua",
-  kuning: "bg-kuning-muda text-kuning",
-  hijau: "bg-hijau-muda text-hijau",
-  abu: "bg-garis/50 text-redup",
+  merah: "bg-accent text-accent-foreground border border-primary/30",
+  kuning: "bg-kuning-muda text-kuning border border-kuning/30",
+  hijau: "bg-hijau-muda text-hijau border border-hijau/30",
+  abu: "bg-muted text-muted-foreground border border-border",
 };
 
 interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {

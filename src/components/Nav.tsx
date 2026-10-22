@@ -3,19 +3,19 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const items = [
-  { href: "/", label: "Ringkasan" },
-  { href: "/penjualan", label: "Penjualan" },
-  { href: "/produk", label: "Produk" },
-  { href: "/stok", label: "Stok" },
-  { href: "/retur", label: "Retur" },
-  { href: "/laporan-harian", label: "Laporan Harian" },
-  { href: "/laporan-karyawan", label: "Laporan Karyawan" },
+  { href: "/", label: "Ringkasan", icon: "fa-layer-group" },
+  { href: "/penjualan", label: "Penjualan", icon: "fa-cart-shopping" },
+  { href: "/produk", label: "Produk", icon: "fa-box" },
+  { href: "/stok", label: "Stok", icon: "fa-warehouse" },
+  { href: "/retur", label: "Retur", icon: "fa-undo" },
+  { href: "/laporan-harian", label: "Laporan Harian", icon: "fa-file-invoice" },
+  { href: "/laporan-karyawan", label: "Laporan Karyawan", icon: "fa-users" },
 ];
 
 export default function Nav() {
   const path = usePathname();
   return (
-    <nav aria-label="Menu utama" className="flex flex-col gap-1 pt-2">
+    <nav aria-label="Menu utama" className="flex flex-col gap-0.5 pt-2">
       {items.map((it) => {
         const active = it.href === "/" ? path === "/" : path.startsWith(it.href);
         return (
@@ -23,12 +23,13 @@ export default function Nav() {
             key={it.href}
             href={it.href}
             aria-current={active ? "page" : undefined}
-            className={`whitespace-nowrap rounded px-3 py-2.5 text-sm font-semibold border-l-4 ${
+            className={`whitespace-nowrap flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold border-l-4 transition-colors ${
               active
-                ? "bg-white/15 text-white border-merah"
-                : "text-white/70 hover:bg-white/10 hover:text-white border-transparent"
+                ? "bg-primary text-primary-foreground border-primary"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground border-transparent"
             }`}
           >
+            <span className={`fas ${it.icon} w-5 shrink-0`} aria-hidden="true" />
             {it.label}
           </Link>
         );

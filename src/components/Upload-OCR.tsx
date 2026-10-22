@@ -90,7 +90,7 @@ export default function UploadOcr() {
       <Button type="button" variant="outline" disabled={loading} onClick={() => inputRef.current?.click()}>
         {loading ? status ?? "Membaca PDF..." : "Upload PDF (OCR)"}
       </Button>
-      {err && <span className="text-xs text-red-600">{err}</span>}
+      {err && <span className="text-xs text-destructive">{err}</span>}
     </div>
   );
 }
