@@ -2,10 +2,48 @@ export type OcrItem = { nama: string; qty: number; harga: number };
 export type OcrNota = {
   invoice_no: string | null;
   tanggal: string | null;
+  /** Jam pada nota, format "HH:MM" (boleh ada detik dari model). */
+  jam: string | null;
   kasir: string | null;
   items: OcrItem[];
   total: number | null;
 };
+
+/** Ambil "HH:MM" dari teks jam apa pun (mis. "14:52:33", "14.52"). */
+export function jamPendek(v: string | null | undefined): string | null {
+  if (!v) return null;
+  const m = String(v).match(/(\d{1,2})[:.](\d{2})/);
+  return m ? `${m[1].padStart(2, "0")}:${m[2]}` : null;
+}
+
+/** Ambil "YYYY-MM-DD" walau model mengembalikan tanggal + jam. */
+export function tanggalPendek(v: string | null | undefined): string | null {
+  if (!v) return null;
+  const m = String(v).match(/(\d{4}-\d{2}-\d{2})/);
+  return m ? m[1] : null;
+}
+
+/**
+ * Kunci isi nota untuk mendeteksi nota yang sama: tanggal + jam + total +
+ * daftar barang (nama, qty, harga). Dipakai untuk membuang halaman ganda
+ * saat OCR dan untuk mencocokkan dengan nota yang sudah tersimpan.
+ */
+export function kunciIsiNota(n: OcrNota): string | null {
+  const tanggal = tanggalPendek(n.tanggal);
+  if (!tanggal) return null;
+  const items = (Array.isArray(n.items) ? n.items : [])
+    .map(
+      (it) =>
+        `${norm(String(it?.nama ?? "")).join(" ")}:${Math.max(1, Math.floor(Number(it?.qty) || 1))}:${Math.round(
+          Number(it?.harga) || 0
+        )}`
+    )
+    .sort()
+    .join("|");
+  const jam = jamPendek(n.jam) ?? "";
+  const total = Math.round(Number(n.total ?? 0));
+  return `${tanggal}#${jam}#${total}#${items}`;
+}
 
 const KEY = "ocr_nota";
 
