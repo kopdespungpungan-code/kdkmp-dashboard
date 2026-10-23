@@ -3,13 +3,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const items = [
-  { href: "/", label: "Ringkasan", icon: "fa-layer-group" },
+  { href: "/dashboard", label: "Ringkasan", icon: "fa-layer-group" },
+  { href: "/presentasi", label: "Presentasi", icon: "fa-chart-pie" },
   { href: "/penjualan", label: "Penjualan", icon: "fa-cart-shopping" },
   { href: "/produk", label: "Produk", icon: "fa-box" },
   { href: "/stok", label: "Stok", icon: "fa-warehouse" },
   { href: "/retur", label: "Retur", icon: "fa-undo" },
   { href: "/laporan-harian", label: "Laporan Harian", icon: "fa-file-invoice" },
   { href: "/laporan-karyawan", label: "Laporan Karyawan", icon: "fa-users" },
+  { href: "/pengaturan", label: "Pengaturan", icon: "fa-gear" },
+  { href: "/docs", label: "Dokumentasi", icon: "fa-book" },
 ];
 
 export default function Nav() {

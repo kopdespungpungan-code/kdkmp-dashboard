@@ -29,13 +29,27 @@ export default function AppLayoutClient({ user, children }: AppLayoutClientProps
         transition={{ type: "spring", damping: 25, stiffness: 400 }}
         className="hidden lg:flex lg:flex-col bg-card text-foreground sticky lg:top-0 h-screen px-4 py-6 border-r border-border"
       >
-        <div className="mb-8 flex flex-col gap-1">
-          <a href="/" className="flex items-center gap-2">
-            <img src="/assets/logo-kopdes.jpg" alt="Logo KDKMP" className="h-8 w-8 rounded" />
-            <span className="text-xs font-bold uppercase tracking-widest text-primary">KDKMP</span>
-            <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Pungpungan</span>
+        <div className="mb-8 flex flex-col gap-2">
+          <a href="/dashboard" aria-label="Beranda Toko Pungpungan" className="block px-1 py-0.5">
+            <img
+              src="/assets/logo-kolaborasi-apn.webp"
+              alt="Agrinas Pangan Nusantara x KDKMP Pungpungan"
+              className="logo-light h-auto w-full object-contain"
+            />
+            <img
+              src="/assets/logo-kolaborasi-apn-dark.webp"
+              alt=""
+              aria-hidden="true"
+              className="logo-dark h-auto w-full object-contain"
+            />
           </a>
-          <p className="text-xs text-muted-foreground">Koperasi Desa Merah Putih</p>
+          <div className="flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-xs font-bold uppercase tracking-widest text-primary">KDKMP Pungpungan</p>
+              <p className="text-xs text-muted-foreground">Koperasi Desa Merah Putih</p>
+            </div>
+            <ThemeToggle />
+          </div>
         </div>
         <Nav />
         <div className="mt-auto p-4 text-xs text-muted-foreground border-t border-border/50">
@@ -45,11 +59,6 @@ export default function AppLayoutClient({ user, children }: AppLayoutClientProps
           </form>
         </div>
       </motion.aside>
-
-      {/* Theme toggle float (desktop) */}
-      <div className="lg:flex lg:items-end lg:justify-end lg:px-8 lg:py-4 fixed lg:bottom-8 lg:right-8 z-20">
-        <ThemeToggle />
-      </div>
 
       <main className="pt-16 lg:pt-0 pb-20 lg:pb-6 px-3 py-6 sm:px-4 lg:px-8">
         <AnimatePresence mode="wait">

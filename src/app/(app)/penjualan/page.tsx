@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { angka, rupiah, tglWaktu } from "@/lib/format";
-import { Alert, Empty, LinkButton, PageHeader } from "@/components/ui";
+import { samarkanKK } from "@/lib/subsidi";
+import { Alert, Badge, Empty, LinkButton, PageHeader } from "@/components/ui";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import UploadOcr from "@/components/Upload-OCR";
 
 export const dynamic = "force-dynamic";
 
-type Invoice = { id: number; invoice_no: string; tanggal: string; kasir: string | null; pcs: number; total: number };
+type Invoice = { id: number; invoice_no: string; tanggal: string; kasir: string | null; pcs: number; total: number; subsidi?: boolean; no_kk?: string | null };
 
 export default async function PenjualanPage() {
   const sb = await createClient();
@@ -35,6 +36,14 @@ export default async function PenjualanPage() {
                     </Link>
                     <div className="text-xs text-redup">{tglWaktu(n.tanggal)}</div>
                     {n.kasir && <div className="text-xs text-redup">{n.kasir}</div>}
+                    {n.subsidi && (
+                      <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                        <Badge tone="merah">Subsidi</Badge>
+                        <span className="text-xs text-redup">
+                          {n.no_kk ? `KK ${samarkanKK(n.no_kk)}` : "KK per barang"}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div className="text-right shrink-0">
                     <div className="font-semibold text-sm">{rupiah(Number(n.total))}</div>

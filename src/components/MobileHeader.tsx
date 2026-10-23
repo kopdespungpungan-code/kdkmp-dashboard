@@ -28,22 +28,47 @@ export default function MobileHeader() {
           </SheetTrigger>
           <SheetContent side="left" className="w-full max-w-[280px] bg-card text-foreground border border-border">
             <SheetHeader className="pb-6">
+              <div className="mb-3 px-1">
+                <img
+                  src="/assets/logo-kolaborasi-apn.webp"
+                  alt="Agrinas Pangan Nusantara x KDKMP Pungpungan"
+                  className="logo-light h-auto w-full object-contain"
+                />
+                <img
+                  src="/assets/logo-kolaborasi-apn-dark.webp"
+                  alt=""
+                  aria-hidden="true"
+                  className="logo-dark h-auto w-full object-contain"
+                />
+              </div>
               <SheetTitle className="text-lg font-bold font-display">Toko Pungpungan</SheetTitle>
               <p className="text-xs text-muted-foreground">Koperasi Desa Merah Putih</p>
             </SheetHeader>
             <Nav />
             <div className="mt-auto p-6 border-t border-border/50">
-              <ThemeToggle className="mb-4" />
               <form action={logout} className="flex items-center gap-2">
                 <button className="text-sm text-muted-foreground underline hover:text-foreground">Keluar</button>
               </form>
             </div>
           </SheetContent>
         </Sheet>
-        <div className="flex items-center gap-1">
-          <img src="/assets/logo-kopdes.jpg" alt="Logo KDKMP" className="h-5 w-5 rounded" />
-          <span className="text-sm font-semibold text-foreground">Toko Pungpungan</span>
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="shrink-0">
+            <img
+              src="/assets/logo-kolaborasi-apn.webp"
+              alt="Agrinas Pangan Nusantara x KDKMP Pungpungan"
+              className="logo-light h-7 w-auto object-contain"
+            />
+            <img
+              src="/assets/logo-kolaborasi-apn-dark.webp"
+              alt=""
+              aria-hidden="true"
+              className="logo-dark h-7 w-auto object-contain"
+            />
+          </span>
+          <span className="truncate text-sm font-semibold text-foreground">Toko Pungpungan</span>
         </div>
+        <ThemeToggle className="ml-1" />
       </header>
     </>
   );

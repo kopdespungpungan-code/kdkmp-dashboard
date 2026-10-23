@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/components/ui/utils";
 
 const items = [
-  { href: "/", label: "Beranda", icon: "fa-home" },
+  { href: "/dashboard", label: "Beranda", icon: "fa-home" },
   { href: "/penjualan", label: "Jual", icon: "fa-cart-shopping" },
   { href: "/produk", label: "Produk", icon: "fa-box" },
   { href: "/stok", label: "Stok", icon: "fa-warehouse" },

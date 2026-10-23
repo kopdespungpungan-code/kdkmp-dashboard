@@ -6,23 +6,51 @@ import { faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "@/components/ui/utils";
 
 export function ThemeToggle({ className }: { className?: string }) {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
+  const base =
+    "inline-flex h-8 w-8 items-center justify-center rounded-full transition-all duration-200";
+
   return (
-    <button
-      onClick={() => {
-        const next = theme === "dark" ? "light" : theme === "light" ? "dark" : "system";
-        setTheme(next);
-      }}
-      aria-label={isDark ? "Ganti ke mode terang" : "Ganti ke mode gelap"}
+    <div
+      role="group"
+      aria-label="Mode tampilan"
       className={cn(
-        "rounded-md p-2 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors",
+        "inline-flex shrink-0 items-center gap-0.5 rounded-full border border-border bg-card p-0.5 shadow-sm",
         className,
       )}
     >
-      <FontAwesomeIcon icon={isDark ? faSun : faMoon} className="w-5 h-5" />
-      <span className="sr-only">{isDark ? "Mode gelap aktif" : "Mode terang aktif"}</span>
-    </button>
+      <button
+        type="button"
+        onClick={() => setTheme("light")}
+        aria-pressed={!isDark}
+        title="Mode terang"
+        className={cn(
+          base,
+          !isDark
+            ? "bg-primary text-primary-foreground shadow-sm"
+            : "text-muted-foreground hover:bg-accent hover:text-foreground",
+        )}
+      >
+        <FontAwesomeIcon icon={faSun} className="h-3.5 w-3.5" />
+        <span className="sr-only">Mode terang</span>
+      </button>
+      <button
+        type="button"
+        onClick={() => setTheme("dark")}
+        aria-pressed={isDark}
+        title="Mode gelap"
+        className={cn(
+          base,
+          isDark
+            ? "bg-primary text-primary-foreground shadow-sm"
+            : "text-muted-foreground hover:bg-accent hover:text-foreground",
+        )}
+      >
+        <FontAwesomeIcon icon={faMoon} className="h-3.5 w-3.5" />
+        <span className="sr-only">Mode gelap</span>
+      </button>
+    </div>
   );
 }

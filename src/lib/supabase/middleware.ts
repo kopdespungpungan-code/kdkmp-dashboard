@@ -25,18 +25,26 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isLogin = request.nextUrl.pathname.startsWith("/login");
-  if (!user && !isLogin) {
+  const { pathname } = request.nextUrl;
+  const isLogin = pathname.startsWith("/login");
+  const isLanding = pathname === "/";
+
+  // Belum login: landing (/) dan login (/login) boleh dibuka. Halaman lain
+  // diarahkan ke login agar data operasional tetap terlindungi.
+  if (!user && !isLanding && !isLogin) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.search = "";
     return NextResponse.redirect(url);
   }
-  if (user && isLogin) {
+
+  // Sudah login: jangan berhenti di landing/login, langsung ke dashboard.
+  if (user && (isLanding || isLogin)) {
     const url = request.nextUrl.clone();
-    url.pathname = "/";
+    url.pathname = "/dashboard";
     url.search = "";
     return NextResponse.redirect(url);
   }
+
   return response;
 }

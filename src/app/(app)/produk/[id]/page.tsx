@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { angka } from "@/lib/format";
 import { Alert, LinkButton, PageHeader } from "@/components/ui";
+import FotoProduk from "@/components/FotoProduk";
 import SubmitButton from "@/components/SubmitButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -58,6 +59,11 @@ export default async function EditProduk({
           <div className="font-semibold">{teksLokasi}</div>
         </div>
       </div>
+
+      <div className="max-w-2xl">
+        <FotoProduk produkId={p.id} nama={p.item} awal={p.foto_url ?? null} />
+      </div>
+
       <form action={action} className="grid max-w-2xl gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2 space-y-2">
           <Label htmlFor="item">Nama barang</Label>
@@ -96,6 +102,13 @@ export default async function EditProduk({
           <input type="checkbox" name="aktif" defaultChecked={p.aktif} className="size-4 accent-merah" />
           Produk aktif dijual
         </label>
+        <label className="flex items-center gap-2 self-end pb-2 text-sm font-semibold">
+          <input type="checkbox" name="subsidi" defaultChecked={p.subsidi} className="size-4 accent-merah" />
+          Barang subsidi
+        </label>
+        <p className="sm:col-span-2 text-xs text-redup">
+          Barang subsidi wajib diisi No. KK saat dijual dan dibatasi 1 transaksi per KK per minggu (Senin–Minggu).
+        </p>
         <div className="sm:col-span-2">
           <SubmitButton>Simpan perubahan</SubmitButton>
         </div>

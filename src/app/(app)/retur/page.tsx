@@ -20,7 +20,7 @@ export default async function ReturPage({ searchParams }: { searchParams: Promis
   const { error, ok } = await searchParams;
   const sb = await createClient();
   const [{ data: prod }, { data: ret, error: e2 }] = await Promise.all([
-    sb.from("products").select("id, item").eq("aktif", true).order("item").limit(5000),
+    sb.from("products").select("*").eq("aktif", true).order("item").limit(5000),
     sb.from("returns").select("id, tanggal, qty_pcs, tipe, keterangan, products(item)").order("tanggal", { ascending: false }).order("id", { ascending: false }).limit(100),
   ]);
   const rows = (ret ?? []) as unknown as Row[];

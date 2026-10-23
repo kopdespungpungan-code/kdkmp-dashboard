@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { login } from "./actions";
 import SubmitButton from "@/components/SubmitButton";
@@ -93,6 +94,11 @@ export default function LoginClient({ error }: { error?: string }) {
             <Input id="password" name="password" type="password" required autoComplete="current-password" />
           </div>
           <SubmitButton pendingText="Masuk...">Masuk</SubmitButton>
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            <Link href="/" className="font-semibold text-primary underline underline-offset-4">
+              ← Kembali ke halaman utama
+            </Link>
+          </p>
         </motion.form>
       </div>
     </motion.div>

@@ -42,7 +42,7 @@ limit 10;
 
 create view v_perlu_perhatian with (security_invoker = true) as
 select id, sku, item, gramasi, stok_toko, stok_gudang,
-       stok_toko + stok_gudang as stok_total, stok_min, expired_terdekat
+       stok_toko + stok_gudang as stok_total, stok_min, expired_terdekat, foto_url
 from products
 where aktif
   and (stok_toko + stok_gudang <= coalesce(stok_min, 0)

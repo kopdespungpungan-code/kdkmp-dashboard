@@ -11,4 +11,5 @@ next-env.d.ts
 
 # File Excel mentah berisi data internal (POS & absensi pegawai).
 # Seed SQL-nya sudah ikut di-commit, jadi file ini tidak perlu masuk repo.
+supabase/seed/**/*.xlsx
 supabase/seed/*.xlsx

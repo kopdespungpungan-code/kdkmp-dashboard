@@ -3,10 +3,12 @@ import { createClient } from "@/lib/supabase/server";
 import { angka, rupiah, tglTanggal } from "@/lib/format";
 import { statusStok } from "@/lib/stok";
 import { ringkasLokasi, type PetaLokasi } from "@/lib/lokasi";
+import { KATA_KUNCI_SUBSIDI } from "@/lib/subsidi";
 import { Alert, Badge, Empty, PageHeader } from "@/components/ui";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { ProductPhoto } from "@/components/ProductPhoto";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClipboardList, faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import type { Product } from "@/lib/types";
@@ -17,9 +19,19 @@ const PER = 40;
 const filters = [
   { key: "", label: "Semua" },
   { key: "perhatian", label: "Perlu perhatian" },
+  { key: "subsidi", label: "Subsidi" },
+  { key: "kandidat", label: "Kandidat subsidi" },
+  { key: "foto", label: "Belum ada foto" },
   { key: "sku", label: "Belum ada SKU" },
   { key: "harga", label: "Belum ada harga jual" },
 ];
+
+// Pola yang sama dengan auto-tanda di supabase/subsidi.sql, ditambah
+// "pupuk" agar semua jenis pupuk ikut ditinjau. Dipakai untuk menampilkan
+// produk yang "mungkin subsidi" tetapi belum dicentang.
+const POLA_KANDIDAT_SUBSIDI = ["pupuk", ...KATA_KUNCI_SUBSIDI]
+  .map((k) => `item.ilike.%${k}%`)
+  .join(",");
 
 export default async function ProdukPage({
   searchParams,
@@ -33,12 +45,17 @@ export default async function ProdukPage({
   let query = sb.from(f === "perhatian" ? "v_perlu_perhatian" : "products").select("*", { count: "exact" });
   if (f === "sku") query = query.is("sku", null);
   if (f === "harga") query = query.is("harga_jual", null);
+  if (f === "foto") query = query.is("foto_url", null);
+  if (f === "subsidi") query = query.eq("subsidi", true);
+  if (f === "kandidat") query = query.eq("subsidi", false).or(POLA_KANDIDAT_SUBSIDI);
   if (f !== "perhatian") query = query.eq("aktif", true);
   const term = q.replace(/[%,()]/g, " ").trim();
   if (term) query = query.or(`item.ilike.%${term}%,sku.ilike.%${term}%`);
   const { data, error, count } = await query.order("item").range((page - 1) * PER, page * PER - 1);
 
   const rows = (data ?? []) as (Product & { stok_total?: number })[];
+  const errorSubsidi = Boolean(error && /subsidi/i.test(error.message));
+  const errorFoto = Boolean(error && /foto_url/i.test(error.message));
 
   // Lokasi fisik tiap produk (gondola + tingkat), untuk "product tracking".
   const petaLokasi = new Map<number, PetaLokasi[]>();
@@ -93,7 +110,15 @@ export default async function ProdukPage({
           </Button>
         }
       />
-      {error && <Alert>{error.message}</Alert>}
+      {error && (
+        <Alert tone={errorSubsidi || errorFoto ? "kuning" : "info"}>
+          {errorSubsidi
+            ? "Fitur subsidi belum aktif di database. Jalankan supabase/subsidi.sql di Supabase SQL Editor, lalu muat ulang halaman ini."
+            : errorFoto
+              ? "Fitur foto produk belum aktif di database. Jalankan supabase/produk_foto.sql di Supabase SQL Editor, lalu muat ulang halaman ini."
+              : error.message}
+        </Alert>
+      )}
 
       <form className="mb-3 flex flex-col sm:flex-row gap-2">
         <Input name="q" defaultValue={q} placeholder="Cari nama atau SKU" className="max-w-sm" aria-label="Cari produk" />
@@ -117,6 +142,13 @@ export default async function ProdukPage({
         ))}
       </div>
 
+      {f === "kandidat" && (
+        <Alert tone="kuning">
+          Produk di bawah cocok dengan pola barang subsidi (pupuk, LPG, SPHP, Minyak Kita)
+          tetapi belum ditandai. Buka produk dan centang <b>Barang subsidi</b> bila sesuai.
+        </Alert>
+      )}
+
       {rows.length === 0 ? (
         <Empty>Tidak ada produk yang cocok.</Empty>
       ) : (
@@ -127,20 +159,30 @@ export default async function ProdukPage({
             return (
               <Card key={r.id}>
                 <CardHeader className="p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <Link href={`/produk/${r.id}`} className="font-semibold hover:underline text-sm truncate block">
-                        {r.item}
-                      </Link>
-                      {r.supplier && <div className="text-xs text-redup truncate">{r.supplier}</div>}
-                      {r.sku && <div className="text-xs text-redup">SKU: {r.sku}</div>}
-                    </div>
-                    <div className="flex flex-wrap gap-1 justify-end">
-                      {st.map((s) => (
-                        <Badge key={s.label} tone={s.tone}>
-                          {s.label}
-                        </Badge>
-                      ))}
+                  <div className="flex items-start gap-3">
+                    <ProductPhoto
+                      src={r.foto_url}
+                      className="h-16 w-16 rounded-lg border border-border"
+                      iconClassName="text-xl"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <Link href={`/produk/${r.id}`} className="font-semibold hover:underline text-sm truncate block">
+                            {r.item}
+                          </Link>
+                          {r.supplier && <div className="text-xs text-redup truncate">{r.supplier}</div>}
+                          {r.sku && <div className="text-xs text-redup">SKU: {r.sku}</div>}
+                        </div>
+                        <div className="flex flex-wrap gap-1 justify-end">
+                          {r.subsidi && <Badge tone="merah">Subsidi</Badge>}
+                          {st.map((s) => (
+                            <Badge key={s.label} tone={s.tone}>
+                              {s.label}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </CardHeader>

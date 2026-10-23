@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Tailwind memakai kelas .dark dari ThemeProvider, bukan prefers-color-scheme. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-display: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Public Sans Variable", ui-sans-serif, system-ui, sans-serif;
@@ -71,6 +74,17 @@
   --color-ring: #ff3b3b;
 }
 
+/* Logo tema: versi cerah dipakai otomatis saat dark mode */
+.logo-dark {
+  display: none;
+}
+.dark .logo-light {
+  display: none;
+}
+.dark .logo-dark {
+  display: inline-block;
+}
+
 html {
   background: var(--color-kertas);
   color: var(--color-ink);
@@ -86,6 +100,141 @@ body {
 h1, h2, h3, .font-display {
   font-family: var(--font-display);
   letter-spacing: -0.01em;
+}
+
+/* Landing page memakai Inter (Figma: best fonts for websites #1). */
+.font-landing,
+.font-landing h1,
+.font-landing h2,
+.font-landing h3,
+.font-landing h4 {
+  font-family: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.02em;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* === Landing page: tema terang/gelap === */
+.landing-shell {
+  --lp-bg: #f6f7f4;
+  --lp-bg-soft: #eef0ea;
+  --lp-fg: #111827;
+  --lp-muted: #5b6472;
+  --lp-muted-soft: #7b8494;
+  --lp-card: rgba(255, 255, 255, 0.72);
+  --lp-card-strong: #ffffff;
+  --lp-chip: rgba(255, 255, 255, 0.68);
+  --lp-border: rgba(17, 24, 39, 0.1);
+  --lp-border-strong: rgba(17, 24, 39, 0.18);
+  --lp-deep: rgba(255, 255, 255, 0.52);
+  --lp-button: #111827;
+  --lp-button-fg: #ffffff;
+  --lp-grid: rgba(17, 24, 39, 0.055);
+  --lp-red: #be1e2d;
+  --lp-green: #2f7d4f;
+  --lp-shadow: 0 30px 80px -44px rgba(17, 24, 39, 0.4);
+  background-color: var(--lp-bg);
+  color: var(--lp-fg);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark .landing-shell {
+  --lp-bg: #050508;
+  --lp-bg-soft: #0a0b10;
+  --lp-fg: #f8fafc;
+  --lp-muted: rgba(248, 250, 252, 0.62);
+  --lp-muted-soft: rgba(248, 250, 252, 0.4);
+  --lp-card: rgba(255, 255, 255, 0.055);
+  --lp-card-strong: #12141a;
+  --lp-chip: rgba(255, 255, 255, 0.07);
+  --lp-border: rgba(255, 255, 255, 0.1);
+  --lp-border-strong: rgba(255, 255, 255, 0.18);
+  --lp-deep: rgba(0, 0, 0, 0.3);
+  --lp-button: #ffffff;
+  --lp-button-fg: #0b0c10;
+  --lp-grid: rgba(255, 255, 255, 0.06);
+  --lp-red: #f87171;
+  --lp-green: #4ade80;
+  --lp-shadow: 0 40px 100px -50px rgba(0, 0, 0, 0.9);
+}
+
+.lp-text {
+  color: var(--lp-fg);
+}
+.lp-muted {
+  color: var(--lp-muted);
+}
+.lp-soft {
+  color: var(--lp-muted-soft);
+}
+.lp-card {
+  background-color: var(--lp-card);
+}
+.lp-card-strong {
+  background-color: var(--lp-card-strong);
+}
+.lp-chip {
+  background-color: var(--lp-chip);
+  border: 1px solid var(--lp-border);
+}
+.lp-deep {
+  background-color: var(--lp-deep);
+}
+.lp-border {
+  border-color: var(--lp-border);
+}
+.lp-border-strong {
+  border-color: var(--lp-border-strong);
+}
+.lp-btn {
+  background-color: var(--lp-button);
+  color: var(--lp-button-fg);
+}
+.lp-btn:hover {
+  opacity: 0.9;
+}
+.lp-glass {
+  background-color: var(--lp-card);
+  border: 1px solid var(--lp-border);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+.lp-glass-strong {
+  background-color: var(--lp-card-strong);
+  border: 1px solid var(--lp-border);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+}
+.lp-header {
+  background-color: var(--lp-bg);
+  background-color: color-mix(in srgb, var(--lp-bg) 88%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.lp-menu {
+  background-color: var(--lp-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.lp-title-gradient {
+  background-image: linear-gradient(
+    100deg,
+    var(--lp-fg) 0%,
+    var(--lp-fg) 52%,
+    var(--lp-muted) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.lp-grid-bg {
+  background-image: radial-gradient(var(--lp-grid) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html:has(.landing-shell) {
+    scroll-behavior: smooth;
+  }
 }
 
 :focus-visible {

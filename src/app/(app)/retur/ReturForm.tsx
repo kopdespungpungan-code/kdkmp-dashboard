@@ -11,8 +11,8 @@ export default function ReturForm({ products, today }: { products: ProductOpt[];
   return (
     <form action={buatRetur} className="grid max-w-3xl gap-4 sm:grid-cols-6">
       <div className="sm:col-span-6 space-y-2">
-        <Label>Barang</Label>
-        <ProductSelect name="product_id" options={products} />
+        <Label htmlFor="product_id">Barang</Label>
+        <ProductSelect inputId="product_id" name="product_id" options={products} />
       </div>
       <div className="sm:col-span-2 space-y-2">
         <Label htmlFor="qty_pcs">Qty (pcs)</Label>
